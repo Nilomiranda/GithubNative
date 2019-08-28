@@ -1,0 +1,21 @@
+import React from 'react';
+import { WebView } from 'react-native-webview';
+import PropTypes from 'prop-types';
+
+function Repository({ navigation }) {
+  console.tron.log(navigation.getParam('item').html_url);
+
+  return <WebView source={{ uri: navigation.getParam('item').html_url }} />;
+}
+
+Repository.navigationOptions = ({ navigation }) => ({
+  title: navigation.getParam('item').name,
+});
+
+Repository.propTypes = {
+  navigation: PropTypes.shape({
+    getParam: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
+export default Repository;

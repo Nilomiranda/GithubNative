@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { TouchableWithoutFeedback, TouchableHighlight } from 'react-native';
 import PropTypes from 'prop-types';
 import api from '../../services/api';
 
@@ -25,6 +26,7 @@ export default class User extends Component {
   static propTypes = {
     navigation: PropTypes.shape({
       getParam: PropTypes.func.isRequired,
+      navigate: PropTypes.func.isRequired,
     }).isRequired,
   };
 
@@ -42,6 +44,12 @@ export default class User extends Component {
 
     this.setState({ stars: response.data, loading: false });
   }
+
+  handleNavigation = item => {
+    const { navigation } = this.props;
+
+    navigation.navigate('Repository', { item });
+  };
 
   render() {
     const { stars, loading } = this.state;
@@ -63,13 +71,17 @@ export default class User extends Component {
             data={stars}
             keyExtractor={star => String(star.id)}
             renderItem={({ item }) => (
-              <Starred>
-                <OwnerAvatar source={{ uri: item.owner.avatar_url }} />
-                <Info>
-                  <Title>{item.name}</Title>
-                  <Author>{item.owner.login}</Author>
-                </Info>
-              </Starred>
+              <TouchableWithoutFeedback
+                onPress={() => this.handleNavigation(item)}
+              >
+                <Starred>
+                  <OwnerAvatar source={{ uri: item.owner.avatar_url }} />
+                  <Info>
+                    <Title>{item.name}</Title>
+                    <Author>{item.owner.login}</Author>
+                  </Info>
+                </Starred>
+              </TouchableWithoutFeedback>
             )}
           />
         )}
