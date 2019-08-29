@@ -33,14 +33,16 @@ export default class User extends Component {
   state = {
     stars: [],
     loading: false,
+    page: 1,
   };
 
   async componentDidMount() {
     const { navigation } = this.props;
+    const { page } = this.state;
     const user = navigation.getParam('user');
 
     this.setState({ loading: true });
-    const response = await api.get(`users/${user.login}/starred`);
+    const response = await api.get(`users/${user.login}/starred?page=${page}`);
 
     this.setState({ stars: response.data, loading: false });
   }
@@ -49,6 +51,20 @@ export default class User extends Component {
     const { navigation } = this.props;
 
     navigation.navigate('Repository', { item });
+  };
+
+  handleEndOFList = async () => {
+    const { page, stars } = this.state;
+    const { navigation } = this.props;
+    const user = navigation.getParam('user');
+
+    const newPage = page + 1;
+
+    const response = await api.get(
+      `users/${user.login}/starred?page=${newPage}`
+    );
+
+    this.setState({ stars: [...stars, ...response.data], page: newPage });
   };
 
   render() {
@@ -70,6 +86,8 @@ export default class User extends Component {
           <Stars
             data={stars}
             keyExtractor={star => String(star.id)}
+            onEndReachedThreshold={0.2}
+            onEndReached={this.handleEndOFList}
             renderItem={({ item }) => (
               <TouchableWithoutFeedback
                 onPress={() => this.handleNavigation(item)}
