@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableWithoutFeedback, TouchableHighlight } from 'react-native';
+import { TouchableWithoutFeedback, RefreshControl } from 'react-native';
 import PropTypes from 'prop-types';
 import api from '../../services/api';
 
@@ -67,6 +67,16 @@ export default class User extends Component {
     this.setState({ stars: [...stars, ...response.data], page: newPage });
   };
 
+  handleRefreshing = async () => {
+    this.setState({ loading: true });
+    const { navigation } = this.props;
+    const user = navigation.getParam('user');
+
+    const response = await api.get(`users/${user.login}/starred`);
+
+    this.setState({ stars: response.data, loading: false });
+  };
+
   render() {
     const { stars, loading } = this.state;
     const { navigation } = this.props;
@@ -101,6 +111,8 @@ export default class User extends Component {
                 </Starred>
               </TouchableWithoutFeedback>
             )}
+            refreshing={loading}
+            onRefresh={this.handleRefreshing}
           />
         )}
       </Container>
